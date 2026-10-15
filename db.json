@@ -1,0 +1,85 @@
+{
+  "cars": [
+    {
+      "id": "CAR-001",
+      "name": "Volvo XC60",
+      "model": "B5 AWD",
+      "year": 2024,
+      "rentPerDay": 899,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-002",
+      "name": "Toyota Corolla",
+      "model": "Hybrid",
+      "year": 2023,
+      "rentPerDay": 649,
+      "status": "Rented"
+    },
+    {
+      "id": "CAR-003",
+      "name": "Volkswagen Golf",
+      "model": "1.5 TSI",
+      "year": 2022,
+      "rentPerDay": 599,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-004",
+      "name": "Kia Niro",
+      "model": "Plug-in Hybrid",
+      "year": 2024,
+      "rentPerDay": 749,
+      "status": "Rented"
+    },
+    {
+      "id": "CAR-005",
+      "name": "Tesla Model 3",
+      "model": "Long Range",
+      "year": 2023,
+      "rentPerDay": 999,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-006",
+      "name": "BMW 3 Series",
+      "model": "320i",
+      "year": 2022,
+      "rentPerDay": 849,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-007",
+      "name": "Audi A4",
+      "model": "40 TFSI",
+      "year": 2023,
+      "rentPerDay": 899,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-008",
+      "name": "Mercedes-Benz C-Class",
+      "model": "C 200",
+      "year": 2024,
+      "rentPerDay": 999,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-009",
+      "name": "Hyundai Tucson",
+      "model": "Hybrid",
+      "year": 2023,
+      "rentPerDay": 799,
+      "status": "Available"
+    },
+    {
+      "id": "CAR-010",
+      "name": "Skoda Octavia",
+      "model": "1.5 TSI",
+      "year": 2022,
+      "rentPerDay": 699,
+      "status": "Available"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Rental Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="viewdata()">
+    <h1>Car Data</h1>
+
+    <div>
+        <label for="carId">Car ID:</label>
+        <input type="text" id="carId" placeholder="Enter car ID"><br><br>
+
+        <label for="name">Car Name:</label>
+        <input type="text" id="name" placeholder="Enter car name"><br><br>
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" placeholder="Enter model"><br><br>
+
+        <label for="year">Year:</label>
+        <input type="number" id="year" placeholder="Enter year"><br><br>
+
+        <label for="rentPerDay">Rent Per Day:</label>
+        <input type="number" id="rentPerDay" placeholder="Enter rent per day"><br><br>
+
+        <label for="status">Status:</label>
+        <input type="text" id="status" placeholder="Enter status"><br><br>
+
+        <button onclick="addCar()">Add Car</button>
+        <p id="message"></p>
+    </div>
+
+    <div>
+        <label for="searchId">Search car by ID:</label>
+        <input type="text" id="searchId" placeholder="Enter car ID"><br><br>
+
+        <button type="button" onclick="searchCarById()">Search</button>
+        <button type="button" onclick="viewdata()">Show all</button>
+        <p id="searchMessage"></p>
+    </div>
+
+    <table width="100%" border="1" id="carTable">
+        <tr>
+            <th>Car ID</th>
+            <th>Car Name</th>
+            <th>Model</th>
+            <th>Year</th>
+            <th>Rent Per Day</th>
+            <th>Status</th>
+            <th>Modify</th>
+            <th>Delete</th>
+        </tr>
+    </table>
+    <script type="text/javascript">
+        function viewdata() {
+            fetch('http://localhost:3000/cars')
+            .then(response => response.json())
+            .then(data => showdata(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function addCar() {
+            var carId = document.getElementById('carId').value.trim();
+            var name = document.getElementById('name').value.trim();
+            var model = document.getElementById('model').value.trim();
+            var year = document.getElementById('year').value;
+            var rentPerDay = document.getElementById('rentPerDay').value;
+            var status = document.getElementById('status').value;
+
+            if (!carId || !name || !model || !year || !rentPerDay || !status) {
+                document.getElementById('message').textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            var newCar = {
+                id: carId,
+                name: name,
+                model: model,
+                year: Number(year),
+                rentPerDay: Number(rentPerDay),
+                status: status
+            };
+
+            fetch('http://localhost:3000/cars', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newCar)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').textContent = 'Car added successfully!';
+                document.getElementById('carId').value = '';
+                document.getElementById('name').value = '';
+                document.getElementById('model').value = '';
+                document.getElementById('year').value = '';
+                document.getElementById('rentPerDay').value = '';
+                document.getElementById('status').value = '';
+                viewdata();
+                console.log(data);
+            });
+        }
+
+        function modifyCar(car) {
+            var year = prompt('Year:', car.year);
+            if (year === null) return;
+
+            var rentPerDay = prompt('Rent per day:', car.rentPerDay);
+            if (rentPerDay === null) return;
+
+            year = Number(year);
+            rentPerDay = Number(rentPerDay);
+            if (!Number.isInteger(year) || year <= 0 || !Number.isFinite(rentPerDay) || rentPerDay < 0) {
+                document.getElementById('message').textContent = 'Enter a valid year and price.';
+                return;
+            }
+
+            var updatedCar = { ...car, year: year, rentPerDay: rentPerDay };
+            fetch('http://localhost:3000/cars/' + encodeURIComponent(car.id), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedCar)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Could not update car.');
+                }
+            })
+            .then(() => {
+                document.getElementById('message').textContent = 'Car updated successfully!';
+                viewdata();
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = error.message;
+            });
+        }
+
+        function showdata(cars) {
+            var table = document.getElementById('carTable');
+            table.innerHTML = `
+                <tr>
+                    <th>Car ID</th>
+                    <th>Car Name</th>
+                    <th>Model</th>
+                    <th>Year</th>
+                    <th>Rent Per Day</th>
+                    <th>Status</th>
+                    <th>Modify</th>
+                    <th>Delete</th>
+                </tr>
+            `;
+
+            cars.forEach(car => {
+                var row = table.insertRow();
+                var values = [car.id, car.name, car.model, car.year, car.rentPerDay, car.status];
+                values.forEach(value => {
+                    var cell = row.insertCell();
+                    cell.textContent = value;
+                });
+                var modifyCell = row.insertCell();
+                var modifyButton = document.createElement('button');
+                modifyButton.type = 'button';
+                modifyButton.textContent = 'Modify';
+                modifyButton.addEventListener('click', () => modifyCar(car));
+                modifyCell.appendChild(modifyButton);
+                var deleteCell = row.insertCell();
+                var deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteCar(car.id));
+                deleteCell.appendChild(deleteButton);
+            });
+        }
+
+        function searchCarById() {
+            var searchId = document.getElementById('searchId').value.trim();
+
+            if (!searchId) {
+                document.getElementById('searchMessage').textContent = 'Please enter a car ID.';
+                viewdata();
+                return;
+            }
+
+            fetch('http://localhost:3000/cars')
+            .then(response => response.json())
+            .then(cars => {
+                var matchedCars = cars.filter(car => String(car.id).toLowerCase().includes(searchId.toLowerCase()));
+
+                document.getElementById('searchMessage').textContent = matchedCars.length
+                    ? 'Found ' + matchedCars.length + ' car(s).'
+                    : 'No car found with that ID.';
+
+                showdata(matchedCars);
+            })
+            .catch(() => {
+                document.getElementById('searchMessage').textContent = 'Could not search cars.';
+            });
+        }
+
+        function deleteCar(carId) {
+            fetch('http://localhost:3000/cars/' + encodeURIComponent(carId), {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    viewdata();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
